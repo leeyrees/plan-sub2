@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2438E0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sub-2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Plan Sub-2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: una columna estrecha pensada para el móvil, barra de pestañas abajo, hoja de registro que sube desde abajo.
+   Aire de dorsal: números condensados grandes sobre gris de asfalto, un único azul de acento, y un color por zona de ritmo. */
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --surface2:#E3E8ED; --ink:#0F1B25; --ink2:#47586A; --line:#D1D9E0;
+  --accent:#2438E0; --accent-ink:#FFFFFF; --accent-soft:#DDE2FB;
+  --z2:#0B7F70; --rm:#9A6A00; --r15:#C74A12; --r10:#BA2147; --ser:#6236BF;
+  --ok:#0F7A55; --warn:#9A6A00; --bad:#B3261E;
+  --display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1319; --surface:#131F28; --surface2:#1B2A35; --ink:#E8EEF2; --ink2:#9FB0BC; --line:#263744;
+    --accent:#8D9BFF; --accent-ink:#0B1319; --accent-soft:#1E2A5E;
+    --z2:#3DD1BC; --rm:#E6B422; --r15:#FF8A52; --r10:#FF6B8B; --ser:#B79CFF;
+    --ok:#3DD49B; --warn:#E6B422; --bad:#FF8478; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1319; --surface:#131F28; --surface2:#1B2A35; --ink:#E8EEF2; --ink2:#9FB0BC; --line:#263744;
+  --accent:#8D9BFF; --accent-ink:#0B1319; --accent-soft:#1E2A5E;
+  --z2:#3DD1BC; --rm:#E6B422; --r15:#FF8A52; --r10:#FF6B8B; --ser:#B79CFF;
+  --ok:#3DD49B; --warn:#E6B422; --bad:#FF8478; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  margin:0;padding-block:16px 96px;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;margin:0;letter-spacing:.01em;text-wrap:balance}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* cabecera */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.top h1{font-size:40px;line-height:.95;text-transform:uppercase;font-weight:700}
+.top .sub{color:var(--ink2);font-size:13px;margin-top:4px}
+.next{background:var(--ink);color:var(--bg);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;min-width:0}
+.next small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.next b{font-family:var(--display);font-size:22px;font-weight:600;line-height:1.1}
+.banner{background:var(--surface);border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:13px}
+
+/* bloques */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.sec-title{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink2);font-family:var(--body);font-weight:600;margin:4px 0 -4px}
+.muted{color:var(--ink2)}
+.small{font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;background:var(--surface2);color:var(--ink2);border:1px solid transparent}
+.chip.phase{background:var(--accent-soft);color:var(--accent)}
+.chip.soft{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.race{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.chip.ov{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;min-height:42px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad);background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.icon{min-width:42px;padding:9px 0}
+
+/* semana */
+.weekhead{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.weekhead .mid{min-width:0;flex:1}
+.weekhead h2{font-size:30px;line-height:1}
+.weekhead .dates{color:var(--ink2);font-size:13px;margin-top:2px}
+.sess{display:flex;flex-direction:column;gap:10px}
+.sess header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.slot{font-family:var(--display);font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+.st{font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:var(--surface2);color:var(--ink2)}
+.st.hecha{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.st.parcial{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.st.saltada{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.sess h3{font-size:27px;line-height:1.05;font-weight:600}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.zone{border-left:4px solid var(--zc);background:color-mix(in srgb,var(--zc) 9%,transparent);border-radius:6px;padding:6px 10px;min-width:0}
+.zn{font-family:var(--display);font-weight:700;font-size:15px;color:var(--zc);text-transform:uppercase;letter-spacing:.05em}
+.zn small{font-family:var(--body);font-size:11px;font-weight:500;color:var(--ink2);text-transform:none;letter-spacing:0;margin-left:6px}
+.zv{font-family:var(--display);font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.zs{font-size:12px;color:var(--ink2)}
+details summary{cursor:pointer;font-size:13px;color:var(--ink2);font-weight:600}
+details p{margin-top:6px;font-size:13px;color:var(--ink2)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.days button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 0;cursor:pointer;min-width:0;min-height:44px;font-size:11px;color:var(--ink2);line-height:1.2}
+.days button b{display:block;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.days button[aria-pressed="true"] b{color:var(--accent-ink)}
+.days button:disabled{opacity:.5;cursor:default}
+.shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.shots a,.shot{display:block;position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:var(--surface2);aspect-ratio:3/4}
+.shots img,.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot button{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(5,10,15,.72);color:#fff;font-size:20px;line-height:1;cursor:pointer}
+.pastebox{min-height:64px;border:2px dashed var(--accent);border-radius:10px;padding:12px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;cursor:text;caret-color:transparent}
+.pastebox:empty::before{content:"Mantén pulsado aquí y toca Pegar";pointer-events:none}
+.pastebox img{max-height:40px}
+#f-paste-msg:empty{display:none}
+.filepick{width:100%;min-height:44px;font-size:14px;color:var(--ink2);border:1px dashed var(--line);border-radius:10px;padding:6px;background:var(--bg)}
+.filepick::file-selector-button{font:inherit;font-weight:600;color:var(--accent-ink);background:var(--accent);border:0;border-radius:8px;padding:9px 14px;margin-right:10px;cursor:pointer}
+.ovnote{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:8px;padding:8px 10px;font-size:13px}
+.logsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.logsum div{min-width:0}
+.logsum small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
+.logsum b{font-family:var(--display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.notes-q{font-size:13px;color:var(--ink2);border-left:3px solid var(--line);padding-left:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.coach{display:flex;flex-direction:column;gap:10px}
+.coach .msg{font-size:14px;overflow-wrap:anywhere}
+.coach .msg small{display:block;color:var(--ink2);font-size:11px;margin-bottom:2px}
+
+/* plan */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.stats small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
+.stats b{font-family:var(--display);font-size:30px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.stats b i{font-style:normal;font-size:16px;color:var(--ink2);font-weight:500}
+.chart{position:relative;height:132px;margin:8px 0 0 26px}
+.grid{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+.grid span{position:absolute;left:-26px;top:-8px;font-size:10px;color:var(--ink2);width:22px;text-align:right}
+.bars{position:absolute;inset:0;display:grid;grid-template-columns:repeat(22,1fr);gap:2px;align-items:end}
+.col{position:relative;height:100%;min-width:0}
+.col .ghost,.col .solid{position:absolute;left:0;right:0;bottom:0;border-radius:3px 3px 0 0}
+.col .ghost{border:1px solid var(--ink2);border-bottom:none;opacity:.45}
+.col .solid{background:var(--accent)}
+.col.race .solid{background:var(--ok)}
+.col.cur::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:3px;background:var(--ink);border-radius:2px}
+.xl{display:grid;grid-template-columns:repeat(22,1fr);gap:2px;margin:10px 0 0 26px;font-size:9px;color:var(--ink2);text-align:center}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.phasehead{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;gap:8px;flex-wrap:wrap}
+.phasehead h3{font-size:22px;text-transform:uppercase}
+.wrow{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.wrow.cur{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.wrow .wn{font-family:var(--display);font-size:28px;font-weight:600;line-height:1;color:var(--ink2)}
+.wrow .wt{min-width:0;font-size:13px}
+.wrow .wt b{display:block;font-size:12px;color:var(--ink2);font-weight:600}
+.wrow .wt span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dots{display:flex;gap:6px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:transparent}
+.dot.hecha{background:var(--ok);border-color:var(--ok)}
+.dot.parcial{background:linear-gradient(90deg,var(--warn) 50%,transparent 50%);border-color:var(--warn)}
+.dot.saltada{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 30%,transparent)}
+.rules{padding-left:18px;margin:8px 0 0;font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+.week7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;text-align:center;font-size:11px}
+.week7 div{border-radius:6px;padding:6px 2px;background:var(--surface2);color:var(--ink2);min-width:0}
+.week7 .q{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);font-weight:600}
+.week7 .l{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);font-weight:600}
+
+/* ritmos / carreras */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 4px;cursor:pointer;font-weight:600;min-height:44px;min-width:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg button small{display:block;font-weight:400;font-size:11px;opacity:.8}
+.pacegrid{display:flex;flex-direction:column;gap:8px}
+.bul{padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink2)}
+.tablewrap{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);font-weight:600;white-space:nowrap}
+tr.hit td{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weight:600}
+.race-card{display:flex;flex-direction:column;gap:12px}
+.race-card h3{font-size:32px;line-height:1;text-transform:uppercase}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tiers div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.tiers small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2)}
+.tiers b{font-family:var(--display);font-size:25px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.tiers span{display:block;font-size:12px;color:var(--ink2)}
+.tiers .t3{border-color:var(--accent);background:var(--accent-soft)}
+.result{background:var(--surface2);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.result b{font-family:var(--display);font-size:36px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+
+/* barra inferior */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:20;
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));
+  display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:10px;text-decoration:none;color:var(--ink2);font-size:11px;font-weight:600;min-width:0}
+.tabs a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs a[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+
+/* hoja de registro */
+.sheet{position:fixed;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet .back{position:absolute;inset:0;background:rgba(5,10,15,.55)}
+.panel{position:relative;background:var(--surface);width:100%;max-width:640px;max-height:92%;overflow:auto;border-radius:16px 16px 0 0;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  display:flex;flex-direction:column;gap:14px}
+.panel h2{font-size:28px;line-height:1.05}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.lbl{font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.field input[type=text],.field input[type=number],.field input[type=date],.field textarea{
+  width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px}
+.field textarea{min-height:84px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rpe{display:flex;align-items:center;gap:12px}
+.rpe input{flex:1;min-width:0;accent-color:var(--accent)}
+.rpe output{font-family:var(--display);font-size:30px;font-weight:600;min-width:34px;text-align:right}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;min-height:36px}
+.fchips button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.pacero{font-family:var(--display);font-size:22px;font-weight:600;color:var(--accent)}
+.err{color:var(--bad);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .primary{flex:1}
+.empty{color:var(--ink2);font-size:14px}
+.connect{display:flex;flex-direction:column;gap:12px}
+.connect h2{font-size:30px;line-height:1.05}
+.connect ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.connect code{font-size:13px;background:var(--surface2);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+.viewer{position:fixed;inset:0;z-index:60;background:rgba(5,10,15,.92);display:flex;align-items:center;justify-content:center;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.viewer button{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:26px;cursor:pointer}
+.foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Plan Sub-2</h1>
+      <div class="sub">2 nov 2026 – 4 abr 2027 · 22 semanas · 15K MetLife + Media de Madrid</div>
+    </div>
+    <div class="next" id="next"></div>
+  </header>
+  <div id="banner"></div>
+  <section id="v-connect" class="card connect" hidden>
+    <h2>Conecta tus datos</h2>
+    <p class="small">La app guarda tus registros en tu repositorio privado <b>plan-sub2-datos</b>. Para que pueda leerlo y escribir en él, necesita una clave de acceso de GitHub. Se crea una sola vez:</p>
+    <ol>
+      <li>Abre <code>github.com/settings/personal-access-tokens/new</code> en el navegador.</li>
+      <li>Nombre: <code>Plan Sub-2</code>. Caducidad: la más larga que te deje.</li>
+      <li>En <b>Repository access</b>, elige <b>Only select repositories</b> y marca <b>plan-sub2-datos</b>.</li>
+      <li>En <b>Permissions</b>, busca <b>Contents</b> y ponlo en <b>Read and write</b>.</li>
+      <li>Pulsa <b>Generate token</b>, cópialo y pégalo aquí.</li>
+    </ol>
+    <div class="field"><label for="f-token">Clave de acceso</label><input type="text" id="f-token" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="github_pat_…"></div>
+    <button class="btn primary" id="c-go" data-act="savetoken">Conectar</button>
+    <div class="err" id="c-err" role="alert"></div>
+    <p class="small muted">La clave se queda solo en este móvil.</p>
+  </section>
+  <section id="v-semana"></section>
+  <section id="v-plan" hidden></section>
+  <section id="v-ritmos" hidden></section>
+  <section id="v-carreras" hidden></section>
+</div>
+
+<nav class="tabs" aria-label="Secciones">
+  <a href="#semana" data-tab="semana"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Semana</a>
+  <a href="#plan" data-tab="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Plan</a>
+  <a href="#ritmos" data-tab="ritmos"><svg viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/></svg>Ritmos</a>
+  <a href="#carreras" data-tab="carreras"><svg viewBox="0 0 24 24"><path d="M6 21V4M6 5h11l-2 4 2 4H6"/></svg>Carreras</a>
+</nav>
+
+<div class="viewer" id="viewer" hidden data-act="closeviewer"><img id="viewer-img" alt="Captura"><button type="button" data-act="closeviewer" aria-label="Cerrar">×</button></div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="back" data-act="close"></div>
+  <form class="panel" id="form" autocomplete="off">
+    <div>
+      <div class="lbl" id="s-kicker"></div>
+      <h2 id="s-title"></h2>
+    </div>
+    <div class="field">
+      <span class="lbl">Cómo fue</span>
+      <div class="seg" id="s-status">
+        <button type="button" data-act="status" data-v="hecha" aria-pressed="true">Hecha</button>
+        <button type="button" data-act="status" data-v="parcial" aria-pressed="false">A medias</button>
+        <button type="button" data-act="status" data-v="saltada" aria-pressed="false">Saltada</button>
+      </div>
+    </div>
+    <div id="s-metrics" style="display:flex;flex-direction:column;gap:14px">
+      <div class="two">
+        <div class="field"><label for="f-date">Fecha</label><input type="date" id="f-date"></div>
+        <div class="field"><label for="f-km">Distancia (km)</label><input type="number" id="f-km" step="0.01" min="0" inputmode="decimal"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="f-time" id="f-time-l">Tiempo</label><input type="text" id="f-time" placeholder="54.12 o 1.21.30" inputmode="decimal"></div>
+        <div class="field"><label for="f-hr">FC media</label><input type="number" id="f-hr" min="40" max="230" inputmode="numeric"></div>
+      </div>
+      <div class="pacero" id="f-pace" aria-live="polite"></div>
+      <div class="field">
+        <label for="f-rpe">Esfuerzo percibido (1 muy fácil, 10 máximo)</label>
+        <div class="rpe"><input type="range" id="f-rpe" min="1" max="10" step="1" value="5"><output id="f-rpe-o" for="f-rpe">5</output></div>
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl">Sensaciones</span>
+      <div class="fchips" id="f-feel"></div>
+    </div>
+    <div class="field"><label for="f-notes">Notas</label><textarea id="f-notes" placeholder="Qué tal las piernas, el ritmo en los bloques, el CrossFit de antes…"></textarea></div>
+    <div class="field" id="f-shots-field">
+      <span class="lbl">Capturas (hasta 4)</span>
+      <div class="shots" id="f-shots"></div>
+      <input type="file" id="f-file" class="filepick" accept="image/*" multiple>
+      <span class="small muted">La de tu reloj o de Strava. Se guardan en tu repositorio privado.</span>
+    </div>
+    <div class="err" id="s-err" role="alert"></div>
+    <div class="actions">
+      <button type="submit" class="btn primary" id="s-save">Guardar</button>
+      <button type="button" class="btn" data-act="close">Cancelar</button>
+      <button type="button" class="btn danger" id="s-del" data-act="del" hidden>Borrar registro</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function(){
+'use strict';
+var START='2026-11-02';
+var MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+var DOW=['lun','mar','mié','jue','vie','sáb','dom'];
+var FEELS=['Fuerte','Sin problemas','Buen ritmo','Piernas pesadas','Sin energía','Molestia','Mal sueño','Calor o frío'];
+
+/* ---------- datos del plan ---------- */
+var PH=[
+  {id:1,name:'Base',from:1,to:9,level:1,sub:'Ritmos nivel 1 · nov – dic'},
+  {id:2,name:'Específico 10K',from:10,to:14,level:2,sub:'Ritmos nivel 2 · ene – 7 feb'},
+  {id:3,name:'Específico 15K',from:15,to:17,level:3,sub:'Ritmos nivel 3 · desde el 8 feb'},
+  {id:4,name:'Media sub-2',from:18,to:22,level:3,sub:'Ritmos nivel 3 · marzo – 4 abr'}
+];
+var HOW={
+  z2:"Todo cómodo, pudiendo hablar. FC por debajo de 152.",
+  fin:"Al acabar los km de Z2, cambias al ritmo indicado y lo mantienes seguido hasta el final. Después, 5' andando.",
+  suave:"Semana suave. Trote en Z2 con FC por debajo de 152 y, al final, 6 progresivos en llano.",
+  series:'Calienta 15\' en Z2 + 2 progresivos. Entre series, trote: 1\'30" en las de 400 m y 2\' en las de 1 y 2 km. Enfría 10\'.',
+  bloques:"Calienta como en las series. 2' de trote entre bloques. Enfría 10'.",
+  z2ritmo:"Los km de Z2 son el calentamiento; después, los km a ritmo seguidos. Enfría 5–10'.",
+  activ:"Semana de carrera, martes o miércoles. 2' de trote entre bloques y 4 progresivos al final."
+};
+function B(t,z,h){return {t:t,z:z,h:h}}
+function A(t,km,z,h){return {t:t,km:km,z:z,h:h}}
+var W=[
+ {n:1,b:B("35' Z2 + 6 progresivos",['Z2'],'suave'),a:A("8 km Z2",8,['Z2'],'z2')},
+ {n:2,b:B("Series 6 × 400 m",['S400'],'series'),a:A("9 km Z2",9,['Z2'],'z2')},
+ {n:3,b:B("Bloques 3 × 6' a R15",['R15'],'bloques'),a:A("10 km Z2",10,['Z2'],'z2')},
+ {n:4,b:B("Series 5 × 1 km",['S1K'],'series'),a:A("11 km: 8 Z2 + 3 R15",11,['Z2','R15'],'fin')},
+ {n:5,soft:1,b:B("Suave: 35' Z2 + 6 progresivos",['Z2'],'suave'),a:A("9 km Z2",9,['Z2'],'z2')},
+ {n:6,b:B("Bloques 3 × 8' a R15",['R15'],'bloques'),a:A("12 km Z2",12,['Z2'],'z2')},
+ {n:7,b:B("Series 6 × 1 km",['S1K'],'series'),a:A("13 km: 9 Z2 + 4 R15",13,['Z2','R15'],'fin')},
+ {n:8,soft:1,b:B("Suave: 35' Z2 + 6 progresivos",['Z2'],'suave'),a:A("10 km Z2",10,['Z2'],'z2')},
+ {n:9,b:B("3 km Z2 + 5 km R15",['Z2','R15'],'z2ritmo'),a:A("14 km Z2",14,['Z2'],'z2')},
+ {n:10,b:B("Series 8 × 400 m",['S400'],'series'),a:A("15 km: 10 Z2 + 5 R15",15,['Z2','R15'],'fin')},
+ {n:11,b:B("Series 3 × 2 km a R10",['R10'],'series'),a:A("16 km Z2",16,['Z2'],'z2')},
+ {n:12,soft:1,b:B("Suave: 35' Z2 + 6 progresivos",['Z2'],'suave'),a:A("12 km Z2",12,['Z2'],'z2')},
+ {n:13,b:B("3 km Z2 + 4 km R10",['Z2','R10'],'z2ritmo'),a:A("16 km Z2",16,['Z2'],'z2')},
+ {n:14,race:'test',b:B("Activación: 30' Z2 + 3 × 3' a R10",['Z2','R10'],'activ')},
+ {n:15,soft:1,b:B("Suave: 40' Z2 + 6 progresivos",['Z2'],'suave'),a:A("17 km: 11 Z2 + 6 R15",17,['Z2','R15'],'fin')},
+ {n:16,b:B("Series 6 × 1 km",['S1K'],'series'),a:A("12 km: 8 Z2 + 4 R15",12,['Z2','R15'],'fin')},
+ {n:17,race:'metlife',b:B("Activación: 30' Z2 + 3 × 3' a R15",['Z2','R15'],'activ')},
+ {n:18,soft:1,b:B("Suave: 35' Z2 + 6 progresivos",['Z2'],'suave'),a:A("14 km Z2",14,['Z2'],'z2')},
+ {n:19,b:B("3 km Z2 + 6 km R15",['Z2','R15'],'z2ritmo'),a:A("18 km: 11 Z2 + 7 RM",18,['Z2','RM'],'fin')},
+ {n:20,b:B("Series 6 × 1 km",['S1K'],'series'),a:A("20 km Z2 (la más larga)",20,['Z2'],'z2')},
+ {n:21,b:B("Bloques 3 × 10' a R15",['R15'],'bloques'),a:A("13 km: 6 Z2 + 7 RM",13,['Z2','RM'],'fin')},
+ {n:22,race:'media',b:B("Activación: 30' Z2 + 3 × 5' a RM",['Z2','RM'],'activ')}
+];
+var RACES={
+  test:{key:'test',wk:14,name:'Test 10K',date:'2027-02-07',hora:'',km:10,tiers:[3480,3360,3240],paces:['5:48','5:36','5:24'],ctrl:'Primer control'},
+  metlife:{key:'metlife',wk:17,name:'15K MetLife',date:'2027-02-28',hora:'9:00',km:15,tiers:[5280,5100,4890],paces:['5:52','5:40','5:26'],ctrl:'Segundo control'},
+  media:{key:'media',wk:22,name:'Media Movistar',date:'2027-04-04',hora:'9:15',km:21.0975,tiers:[7740,7500,7170],paces:['6:07','5:55','5:40'],ctrl:'Objetivo final'}
+};
+var ZONES={
+  Z2:{label:'Z2',name:'rodaje',hr:'135–152',col:'--z2',r:{1:[435,465],2:[420,450],3:[405,435]}},
+  RM:{label:'RM',name:'ritmo media',hr:'153–161',col:'--rm',c:{1:375,2:360,3:340},r:{1:[360,390],2:[345,375],3:[325,355]}},
+  R15:{label:'R15',name:'umbral',hr:'162–170',col:'--r15',c:{1:365,2:350,3:335},r:{1:[350,380],2:[335,365],3:[320,350]}},
+  R10:{label:'R10',name:'ritmo 10K',hr:'166–174',col:'--r10',c:{1:360,2:340,3:325},r:{1:[345,375],2:[325,355],3:[310,340]}},
+  S400:{label:'Series',name:'400 m',hr:'',col:'--ser',c:{1:320,2:305,3:290},r:{1:[310,340],2:[295,325],3:[280,310]}},
+  S1K:{label:'Series',name:'1 km',hr:'',col:'--ser',c:{1:330,2:315,3:300},r:{1:[310,340],2:[295,325],3:[280,310]}}
+};
+var ZORDER=['Z2','RM','R15','R10','S400','S1K'];
+
+/* ---------- utilidades ---------- */
+function pad(n){return String(n).padStart(2,'0')}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function addDays(iso,n){var p=iso.split('-').map(Number);return new Date(Date.UTC(p[0],p[1]-1,p[2]+n)).toISOString().slice(0,10)}
+function dayDiff(a,b){var x=a.split('-').map(Number),y=b.split('-').map(Number);return Math.round((Date.UTC(y[0],y[1]-1,y[2])-Date.UTC(x[0],x[1]-1,x[2]))/86400000)}
+function fshort(iso){var p=iso.split('-').map(Number);return p[2]+' '+MES[p[1]-1]}
+function fdow(iso){var p=iso.split('-').map(Number);var d=new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();return DOW[(d+6)%7]}
+function todayIso(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function fpace(s){s=Math.round(s);return Math.floor(s/60)+':'+pad(s%60)}
+function fdur(s){s=Math.round(s);var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return h?h+':'+pad(m)+':'+pad(x):m+':'+pad(x)}
+function parseDur(str){
+  str=String(str||'').trim();if(!str)return null;
+  var p;
+  if(/^\d+$/.test(str)){
+    if(str.length<=2)return parseInt(str,10)*60;
+    if(str.length<=4){str=str.padStart(4,'0');p=[+str.slice(0,2),+str.slice(2)]}
+    else if(str.length<=6){str=str.padStart(6,'0');p=[+str.slice(0,2),+str.slice(2,4),+str.slice(4)]}
+    else return null;
+  }else{
+    p=str.split(/[:.,'\s]+/).filter(Boolean).map(Number);
+  }
+  if(!p.length||p.some(function(x){return isNaN(x)||x<0}))return null;
+  if(p.length>1&&p.slice(1).some(function(x){return x>=60}))return null;
+  if(p.length===1)return Math.round(p[0]*60);
+  if(p.length===2)return p[0]*60+p[1];
+  if(p.length===3)return p[0]*3600+p[1]*60+p[2];
+  return null;
+}
+function wkStart(n){return addDays(START,7*(n-1))}
+function wkSun(n){return addDays(START,7*(n-1)+6)}
+function phaseOf(n){return PH.filter(function(p){return n>=p.from&&n<=p.to})[0]}
+function sid(n,slot){return 's'+pad(n)+slot}
+function currentWeek(){var d=dayDiff(START,todayIso());if(d<0)return 0;var n=Math.floor(d/7)+1;return n>22?23:n}
+
+/* ---------- estado ---------- */
+var state={db:undefined,sessions:{},overrides:{},schedule:{},coach:[],settings:{},sel:1,lvlView:null,err:'',loadErr:''};
+function pdate(n,slot){var s=state.schedule['w'+pad(n)];var d=s&&s[slot];if(d&&d>=wkStart(n)&&d<=wkSun(n))return d;return slot==='a'?wkSun(n):null}
+function dayPicker(n,slot){
+  var cur=pdate(n,slot),h='<div class="days" role="group" aria-label="Día de entreno">';
+  for(var i=0;i<7;i++){var d=addDays(wkStart(n),i);h+='<button type="button" data-act="setday" data-n="'+n+'" data-slot="'+slot+'" data-d="'+d+'" aria-pressed="'+(cur===d)+'"'+(state.db?'':' disabled')+'>'+DOW[i].toUpperCase().slice(0,1).replace('M',i===2?'X':'M')+'<b>'+d.slice(8).replace(/^0/,'')+'</b></button>'}
+  return h+'</div>';
+}
+var cw=currentWeek();
+state.sel=cw<1?1:(cw>22?22:cw);
+
+function effLevel(n){return state.settings.level||phaseOf(n).level}
+function sess(n,slot){return state.sessions[sid(n,slot)]||null}
+function ovr(n){return state.overrides['w'+pad(n)]||null}
+function plannedB(n){var w=W[n-1],o=ovr(n);var b=Object.assign({},w.b);if(o&&o.b)Object.assign(b,o.b);return b}
+function plannedA(n){var w=W[n-1];if(w.race)return null;var o=ovr(n);var a=Object.assign({},w.a);if(o&&o.a)Object.assign(a,o.a);return a}
+
+/* ---------- zonas ---------- */
+function zoneChip(code,level){
+  var z=ZONES[code];if(!z)return '';var adj=Number(state.settings.paceAdj)||0;var main,sub;
+  if(code==='Z2'){main='FC '+z.hr;sub='ritmo libre · ~'+fpace(z.r[level][0])+'–'+fpace(z.r[level][1])}
+  else{main=fpace(z.c[level]+adj)+'/km';sub=fpace(z.r[level][0]+adj)+'–'+fpace(z.r[level][1]+adj)+(z.hr?' · FC '+z.hr:' · sin mirar FC')}
+  return '<div class="zone" style="--zc:var('+z.col+')"><div class="zn">'+esc(z.label)+'<small>'+esc(z.name)+'</small></div><div class="zv">'+esc(main)+'</div><div class="zs">'+esc(sub)+'</div></div>';
+}
+
+/* ---------- vistas ---------- */
+function statusChip(s){
+  if(!s)return '<span class="st">Pendiente</span>';
+  var m={hecha:'Hecha',parcial:'A medias',saltada:'Saltada'};
+  return '<span class="st '+esc(s.status)+'">'+(m[s.status]||'Hecha')+'</span>';
+}
+function shotsHtml(s){
+  if(!s||!s.shots||!s.shots.length)return '';
+  return '<div class="shots">'+s.shots.map(function(p){return '<a href="#" data-act="viewshot" data-p="'+esc(p)+'"><img data-shot="'+esc(p)+'" alt="Captura de la sesión"></a>'}).join('')+'</div>';
+}
+function logSummary(s){
+  if(!s||s.status==='saltada')return s?((s.notes?'<div class="notes-q">'+esc(s.notes)+'</div>':'')+shotsHtml(s)):'';
+  var cells=[];
+  if(s.km)cells.push(['Km',String(Math.round(s.km*100)/100)]);
+  if(s.durationSec)cells.push(['Tiempo',fdur(s.durationSec)]);
+  if(s.km&&s.durationSec)cells.push(['Ritmo',fpace(s.durationSec/s.km)]);
+  if(s.avgHr)cells.push(['FC',String(s.avgHr)]);
+  if(s.rpe)cells.push(['Esfuerzo',s.rpe+'/10']);
+  var h='';
+  if(cells.length)h+='<div class="logsum">'+cells.map(function(c){return '<div><small>'+c[0]+'</small><b>'+esc(c[1])+'</b></div>'}).join('')+'</div>';
+  if(s.feel&&s.feel.length)h+='<div class="chips">'+s.feel.map(function(f){return '<span class="chip">'+esc(f)+'</span>'}).join('')+'</div>';
+  if(s.notes)h+='<div class="notes-q">'+esc(s.notes)+'</div>';
+  h+=shotsHtml(s);
+  return h;
+}
+function sessionCard(n,slot){
+  var lvl=effLevel(n),s=sess(n,slot),o=ovr(n),w=W[n-1];
+  var p=slot==='a'?plannedA(n):plannedB(n);
+  var pd=pdate(n,slot);
+  var when=(slot==='a'?'Día A':'Día B · calidad')+(pd?' · '+fdow(pd)+' '+fshort(pd):' · sin día');
+  var h='<article class="card sess"><header><span class="slot">'+when+'</span>'+statusChip(s)+'</header>';
+  h+=dayPicker(n,slot);
+  h+='<h3>'+esc(p.t)+'</h3>';
+  h+='<div class="zones">'+p.z.map(function(c){return zoneChip(c,lvl)}).join('')+'</div>';
+  if(p.h&&HOW[p.h])h+='<details><summary>Cómo se hace</summary><p>'+esc(HOW[p.h])+'</p></details>';
+  var note=o&&o[slot]&&o[slot].note;
+  if(note)h+='<div class="ovnote"><span class="chip ov">Ajustado</span> '+esc(note)+'</div>';
+  h+=logSummary(s);
+  h+='<button class="btn '+(s?'ghost':'primary')+'" data-act="log" data-n="'+n+'" data-slot="'+slot+'">'+(s?'Editar registro':'Registrar sesión')+'</button></article>';
+  return h;
+}
+function tierLabel(r,t){
+  var T=r.tiers;if(t<=T[2])return 'Ritmo de sub-2';if(t<=T[1])return 'Entre probable y sub-2';if(t<=T[0])return 'Entre suelo y probable';return 'Por encima del suelo';
+}
+function raceCardWeek(n){
+  var w=W[n-1],r=RACES[w.race],s=sess(n,'a');
+  var h='<article class="card sess"><header><span class="slot">Día A · dom '+fshort(r.date)+(r.hora?' · '+r.hora:'')+'</span>'+statusChip(s)+'</header>';
+  h+='<h3>'+esc(r.name)+'</h3>';
+  h+='<div class="tiers">'+['Suelo','Probable','Sub-2'].map(function(l,i){return '<div class="'+(i===2?'t3':'')+'"><small>'+l+'</small><b>'+fdur(r.tiers[i])+'</b><span>'+r.paces[i]+'/km</span></div>'}).join('')+'</div>';
+  h+=logSummary(s);
+  h+='<button class="btn '+(s?'ghost':'primary')+'" data-act="log" data-n="'+n+'" data-slot="a">'+(s?'Editar resultado':'Registrar resultado')+'</button></article>';
+  return h;
+}
+function coachCard(){
+  var list=state.coach.slice().sort(function(a,b){return String(b.createdAt||'').localeCompare(String(a.createdAt||''))}).slice(0,3);
+  var h='<div class="card coach"><h4 class="sec-title" style="margin:0">Notas de Claude</h4>';
+  if(!list.length)h+='<p class="empty">Cuando me cuentes cómo te ha ido, pídeme en el chat que revise tus registros. Los ajustes del plan y mis comentarios aparecerán aquí.</p>';
+  else list.forEach(function(m){h+='<div class="msg"><small>'+(m.createdAt?esc(String(m.createdAt).slice(0,10)):'')+(m.week?' · semana '+esc(m.week):'')+'</small>'+esc(m.text)+'</div>'});
+  return h+'</div>';
+}
+function renderSemana(){
+  var n=state.sel,w=W[n-1],ph=phaseOf(n),lvl=effLevel(n);
+  var h='<div class="weekhead"><button class="btn icon" data-act="prev" aria-label="Semana anterior"'+(n<=1?' disabled':'')+'>‹</button>';
+  h+='<div class="mid"><h2>Semana '+n+' de 22</h2><div class="dates">'+fshort(wkStart(n))+' – '+fshort(wkSun(n))+(n===cw?' · esta semana':'')+'</div></div>';
+  h+='<button class="btn icon" data-act="next" aria-label="Semana siguiente"'+(n>=22?' disabled':'')+'>›</button></div>';
+  h+='<div class="chips"><span class="chip phase">'+esc(ph.name)+'</span><span class="chip">Nivel '+lvl+'</span>';
+  if(w.soft)h+='<span class="chip soft">Semana suave</span>';
+  if(w.race)h+='<span class="chip race">Semana de carrera</span>';
+  if(n!==cw&&cw>=1&&cw<=22)h+='<button class="chip" data-act="today" style="cursor:pointer;border-color:var(--line)">Ir a esta semana</button>';
+  h+='</div>';
+  if(cw<1)h+='<div class="card small">El plan empieza el lunes 2 de noviembre. Quedan '+dayDiff(todayIso(),START)+' días.</div>';
+  h+=coachCard();
+  h+=sessionCard(n,'b');
+  h+=w.race?raceCardWeek(n):sessionCard(n,'a');
+  return h;
+}
+function renderPlan(){
+  var done=0,km=0;
+  Object.keys(state.sessions).forEach(function(k){var s=state.sessions[k];if(s.status==='hecha'||s.status==='parcial'){done++;km+=Number(s.km)||0}});
+  var h='<div class="stats"><div><small>Sesiones</small><b>'+done+' <i>/ 44</i></b></div><div><small>Km</small><b>'+(Math.round(km*10)/10)+'</b></div><div><small>Semana</small><b>'+(cw<1?'–':(cw>22?'22':cw))+' <i>/ 22</i></b></div></div>';
+  var MAXK=24,cols='',xl='';
+  W.forEach(function(w){
+    var n=w.n,a=plannedA(n),planned=a?a.km:(RACES[w.race].km);
+    var tot=0;['a','b'].forEach(function(sl){var s=sess(n,sl);if(s&&s.status!=='saltada')tot+=Number(s.km)||0});
+    cols+='<div class="col'+(w.race?' race':'')+(n===cw?' cur':'')+'"><div class="ghost" style="height:'+Math.min(100,planned/MAXK*100)+'%"></div><div class="solid" style="height:'+Math.min(100,tot/MAXK*100)+'%"></div></div>';
+    xl+='<span>'+n+'</span>';
+  });
+  h+='<div class="card"><h4 class="sec-title" style="margin:0 0 4px">Km por semana</h4><div class="chart"><div class="grid" style="bottom:'+(10/MAXK*100)+'%"><span>10</span></div><div class="grid" style="bottom:'+(20/MAXK*100)+'%"><span>20</span></div><div class="bars">'+cols+'</div></div><div class="xl">'+xl+'</div>';
+  h+='<div class="legend"><span><i style="border:1px solid var(--ink2);opacity:.6"></i>Día A del plan</span><span><i style="background:var(--accent)"></i>Km registrados</span><span><i style="background:var(--ok)"></i>Semana de carrera</span></div></div>';
+  h+='<details class="card"><summary>Reglas con el CrossFit</summary><div class="week7"><div>L<br>Cross</div><div class="q">M<br>Día B</div><div>X<br>Cross</div><div>J<br>Descanso</div><div>V<br>Cross</div><div>S<br>Descanso</div><div class="l">D<br>Día A</div></div>';
+  h+='<ul class="rules"><li>Entre el Día B y el Día A, deja al menos un día en medio.</li><li>Evita el Día B justo después de un WOD con mucha pierna (sentadilla, peso muerto, saltos). Si cae así, hazlo en el lado lento del rango.</li><li>El día antes del Día A, descanso o CrossFit suave.</li><li>Semana de carrera: nada de pierna pesada los 3 días anteriores, y descanso el día después.</li><li>Si una semana solo puedes correr un día, haz el Día A.</li><li>Un tercer rodaje (30–40\' en Z2) solo si te apetece. El plan no cuenta con él, pero para el sub-2 es lo que más suma.</li><li>Si pierdes una semana, no la recuperes: repite la anterior y sigue.</li></ul>';
+  h+='<p class="small muted" style="margin-top:10px"><b>Progresivos.</b> 20 segundos acelerando poco a poco hasta ir rápida pero suelta, sin esprintar (hacia 5:00 al principio y hacia 4:40 en marzo). Después, 60–90" andando o trotando, y el siguiente. En llano, al final del rodaje o del calentamiento.</p></details>';
+  h+='<div class="foot"><button class="btn ghost" data-act="reload">Actualizar datos</button><button class="btn ghost" data-act="logout">Cambiar clave de acceso</button></div>';
+  PH.forEach(function(p){
+    h+='<div class="phasehead"><h3>'+esc(p.name)+'</h3><span class="small muted">'+esc(p.sub)+'</span></div>';
+    for(var n=p.from;n<=p.to;n++){
+      var w=W[n-1],b=plannedB(n),a=plannedA(n),sb=sess(n,'b'),sa=sess(n,'a');
+      var at=a?a.t:(RACES[w.race].name+' · dom '+fshort(RACES[w.race].date));
+      var pb=pdate(n,'b'),pa=pdate(n,'a');
+      h+='<button class="wrow'+(n===cw?' cur':'')+'" data-act="goweek" data-n="'+n+'"><span class="wn">'+n+'</span><span class="wt"><b>'+fshort(wkStart(n))+' – '+fshort(wkSun(n))+(w.soft?' · suave':'')+(w.race?' · carrera':'')+'</b><span>B'+(pb?' '+fdow(pb):'')+' · '+esc(b.t)+'</span><span>A'+(pa?' '+fdow(pa):'')+' · '+esc(at)+'</span></span><span class="dots"><i class="dot '+(sb?esc(sb.status):'')+'"></i><i class="dot '+(sa?esc(sa.status):'')+'"></i></span></button>';
+    }
+  });
+  return h;
+}
+function renderRitmos(){
+  var base=cw>=1&&cw<=22?effLevel(cw):effLevel(state.sel);
+  var lv=state.lvlView||base;var adj=Number(state.settings.paceAdj)||0;
+  var h='<div class="sec-title">Nivel de ritmos</div><div class="seg">';
+  [['1','nov – dic'],['2','ene – 7 feb'],['3','desde 8 feb · sub-2']].forEach(function(x,i){h+='<button data-act="lvl" data-l="'+(i+1)+'" aria-pressed="'+(lv===i+1)+'">Nivel '+x[0]+'<small>'+x[1]+'</small></button>'});
+  h+='</div>';
+  if(adj)h+='<div class="ovnote"><span class="chip ov">Ajustado</span> Los ritmos llevan '+(adj>0?'+':'')+adj+' s/km sobre la tabla original.</div>';
+  h+='<div class="pacegrid">'+ZORDER.map(function(c){return zoneChip(c,lv)}).join('')+'</div>';
+  h+='<div class="card"><ul class="bul"><li>Z2: pon la alerta por FC (135–152), no por ritmo. Según mejores, irás más rápida con la misma FC.</li><li>Sube de nivel solo cuando el cuerpo lo confirme: en los bloques de R15 la FC no pasa de 160 y terminas entera. Si un nivel se te atraganta, quédate una semana más en el anterior.</li><li>El nivel 3 está calculado para un 10K de 54:00. Por cada 30" que el test salga más lento, suma 3"/km a todos sus ritmos.</li><li>Tu reloj pone el umbral en 5:43. Hoy estás más cerca de 6:05; en línea sub-2, pasarías por 5:50 en enero y 5:35 en febrero.</li><li>Trote para calentar y recuperar: más lento de 8:00, FC por debajo de 135. Progresivos: sin alerta, por tiempo.</li></ul></div>';
+  return h;
+}
+function raceTable(rows,head,hit){
+  return '<div class="tablewrap"><table><thead><tr>'+head.map(function(x){return '<th>'+x+'</th>'}).join('')+'</tr></thead><tbody>'+rows.map(function(r,i){return '<tr'+(hit===i?' class="hit"':'')+'>'+r.map(function(c){return '<td>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
+}
+function raceBlock(r){
+  var n=r.wk,s=sess(n,'a'),days=dayDiff(todayIso(),r.date);
+  var h='<article class="card race-card"><div><div class="lbl">'+esc(r.ctrl)+' · semana '+n+'</div><h3>'+esc(r.name)+'</h3><div class="small muted">dom '+fshort(r.date)+(r.hora?', '+r.hora:'')+' · '+(days>0?'faltan '+days+' días':(days===0?'hoy':'hace '+(-days)+' días'))+'</div></div>';
+  h+='<div class="tiers">'+['Suelo','Probable','Sub-2'].map(function(l,i){return '<div class="'+(i===2?'t3':'')+'"><small>'+l+'</small><b>'+fdur(r.tiers[i])+'</b><span>'+r.paces[i]+'/km</span></div>'}).join('')+'</div>';
+  var hit=-1;
+  if(s&&s.durationSec&&s.status!=='saltada'){
+    var t=s.durationSec;
+    h+='<div class="result"><div class="lbl">Tu resultado</div><b>'+fdur(t)+'</b><div class="small">'+fpace(t/r.km)+'/km · '+esc(tierLabel(r,t))+'</div>';
+    if(r.key==='test'){
+      hit=t<=3240?0:(t<=3330?1:(t<=3420?2:3));
+      if(t>3240){var adj=Math.round((t-3240)/30*3);h+='<div class="small muted">Por la regla del plan, los ritmos del nivel 3 subirían unos '+adj+' s/km.</div>'}
+    }
+    h+='</div>';
+  }
+  h+='<button class="btn '+(s?'ghost':'primary')+'" data-act="log" data-n="'+n+'" data-slot="a">'+(s?'Editar resultado':'Registrar resultado')+'</button>';
+  if(r.key==='test'){
+    h+='<p class="small">Km 1–2 a 5:30, del 3 al 8 a 5:22–5:25, y los dos últimos, todo lo que quede.</p>';
+    h+='<div class="lbl">Qué dice tu 10K de lo que viene</div>'+raceTable([['54:00 o menos','1:22 o menos','Sub-2 en juego'],['54:00 – 55:30','1:22 – 1:24:30','2:00 – 2:03'],['55:30 – 57:00','1:24:30 – 1:27','2:03 – 2:06'],['Más de 57:00','1:27 – 1:29','2:06 – 2:10']],['10K','MetLife','Media'],hit);
+    h+='<p class="small muted">Si ese 10K tiene cuestas, el tiempo vale menos como referencia.</p>';
+  }
+  if(r.key==='metlife'){
+    h+='<p class="small muted">Sale de la Castellana, junto a Cuzco, hacia Plaza de Castilla, y termina en Madrid Río, en el Puente del Rey. Unos 100 m de bajada neta, con dos repechos: el primer kilómetro y el tramo Colón – Génova – Bilbao. La estimación es 1–2 minutos a favor frente a un 15K llano.</p>';
+    h+=raceTable([['0 – 4','Subida corta hacia Plaza de Castilla y Bravo Murillo ondulado','~5:35'],['4 – 7','Bajada tendida por Raimundo Fernández Villaverde y la Castellana','~5:15'],['7 – 10','Giro en Recoletos y repecho Colón – Génova – Bilbao','~5:35, por esfuerzo'],['10 – 11','Llano por Alberto Aguilera y Princesa','~5:25'],['11 – 13','Bajada fuerte de Moncloa al río, con ida y vuelta en Camoens','~5:10'],['13 – 15','Llano por Madrid Río hasta meta','~5:20, vacía'],['<b>Total</b>','','<b>~1:21:15</b>']],['Km','Qué hay','Ritmo']);
+    h+='<ul class="bul"><li>En las bajadas, zancada corta y rápida: ni frenes ni te lances.</li><li>Entre edificios el GPS falla: guíate por los carteles de km y el ritmo medio, no el instantáneo.</li><li>Lectura para la media: 1:21:30 o menos, sub-2 confirmado; 1:23, ~2:01:30; 1:25, ~2:04:30.</li></ul>';
+  }
+  if(r.key==='media'){
+    h+='<p class="small muted">No es llana: unos 200 m de subida acumulada. Los primeros 5–6 km suben la Castellana hasta Plaza de Castilla; después, terreno ondulado por el centro, y un final favorable bajando hacia Cibeles. Frente a una media llana cuesta 1–2 minutos.</p>';
+    h+=raceTable([['0 – 6','Subida tendida por la Castellana','~5:45, por esfuerzo'],['6 – 17','Ondulado por el centro','~5:40'],['17 – meta','Final favorable','~5:30 o lo que quede'],['<b>Total</b>','','<b>~1:59:20</b>']],['Km','Qué hay','Ritmo']);
+    h+='<ul class="bul"><li>No te cebes en la subida de la Castellana: los segundos que pierdas ahí se recuperan en la bajada final.</li><li>Pasar el km 6 en ~34:30 es ir en tiempo.</li></ul>';
+  }
+  return h+'</article>';
+}
+function renderCarreras(){return ['test','metlife','media'].map(function(k){return raceBlock(RACES[k])}).join('')}
+
+function renderNext(){
+  var t=todayIso(),list=['test','metlife','media'].map(function(k){return RACES[k]}).filter(function(r){return r.date>=t});
+  var el=document.getElementById('next');
+  if(!list.length){el.hidden=true;return}
+  var r=list[0],d=dayDiff(t,r.date);el.hidden=false;
+  el.innerHTML='<small>Próxima carrera</small><b>'+esc(r.name)+' · '+d+(d===1?' día':' días')+'</b>';
+}
+function renderBanner(){
+  var b=document.getElementById('banner');
+  b.innerHTML=state.loadErr?'<div class="banner">'+esc(state.loadErr)+' <button class="chip" data-act="reload" style="cursor:pointer">Reintentar</button></div>':'';
+}
+var raf=0;
+function render(){
+  if(raf)return;
+  raf=requestAnimationFrame(function(){
+    raf=0;
+    document.getElementById('v-semana').innerHTML='<div style="display:flex;flex-direction:column;gap:16px">'+renderSemana()+'</div>';
+    document.getElementById('v-plan').innerHTML='<div style="display:flex;flex-direction:column;gap:12px">'+renderPlan()+'</div>';
+    document.getElementById('v-ritmos').innerHTML='<div style="display:flex;flex-direction:column;gap:12px">'+renderRitmos()+'</div>';
+    document.getElementById('v-carreras').innerHTML='<div style="display:flex;flex-direction:column;gap:16px">'+renderCarreras()+'</div>';
+    renderNext();renderBanner();hydrateImgs();
+  });
+}
+
+/* ---------- rutas ---------- */
+var VIEWS=['semana','plan','ritmos','carreras'];
+function route(){
+  var v=location.hash.replace('#','');if(VIEWS.indexOf(v)<0)v='semana';
+  var off=!TOKEN;
+  document.getElementById('v-connect').hidden=!off;
+  document.querySelector('.tabs').hidden=off;
+  VIEWS.forEach(function(x){document.getElementById('v-'+x).hidden=off||x!==v});
+  document.querySelectorAll('.tabs a').forEach(function(a){if(a.dataset.tab===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+}
+window.addEventListener('hashchange',function(){route();window.scrollTo(0,0)});
+
+/* ---------- conexión con GitHub ---------- */
+var OWNER='leeyrees',REPO='plan-sub2-datos';
+var API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
+var TOKEN=null;try{TOKEN=localStorage.getItem('gh_token')}catch(e){}
+var SHA={};
+function b64e(str){var u=new TextEncoder().encode(str),s='';for(var i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)}
+function b64d(b){var s=atob(String(b).replace(/\s/g,'')),u=new Uint8Array(s.length);for(var i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new TextDecoder().decode(u)}
+function ghErr(status,msg){var e=new Error(msg||('GitHub '+status));e.status=status;return e}
+async function gh(path,opt){
+  opt=opt||{};
+  var h={'Authorization':'Bearer '+TOKEN,'Accept':opt.accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+  if(opt.body)h['Content-Type']='application/json';
+  return fetch(API+path,{method:opt.method||'GET',headers:h,body:opt.body?JSON.stringify(opt.body):undefined,cache:'no-store'});
+}
+async function readJson(path,def){
+  var r=await gh(path);
+  if(r.status===404){delete SHA[path];return def}
+  if(!r.ok)throw ghErr(r.status);
+  var j=await r.json();SHA[path]=j.sha;
+  try{return JSON.parse(b64d(j.content))}catch(e){return def}
+}
+async function writeJson(path,obj,msg){
+  var body={message:msg,content:b64e(JSON.stringify(obj,null,2)+'\n')};
+  if(SHA[path])body.sha=SHA[path];
+  var r=await gh(path,{method:'PUT',body:body});
+  if(!r.ok)throw ghErr(r.status);
+  var j=await r.json();SHA[path]=j.content.sha;
+}
+/* Lee la versión más reciente, aplica el cambio y guarda; si alguien (Claude) lo ha tocado entre medias, repite una vez. */
+async function mutate(path,def,fn,msg){
+  for(var tries=0;tries<2;tries++){
+    var d=await readJson(path,def);
+    var next=fn(d)||d;
+    try{await writeJson(path,next,msg);return next}
+    catch(e){if((e.status===409||e.status===422)&&tries===0)continue;throw e}
+  }
+}
+async function putBinary(path,b64,msg){
+  var r=await gh(path,{method:'PUT',body:{message:msg,content:b64}});
+  if(!r.ok)throw ghErr(r.status);
+}
+async function deleteFile(path,msg){
+  var r=await gh(path);if(!r.ok)return;
+  var j=await r.json();
+  await gh(path,{method:'DELETE',body:{message:msg,sha:j.sha}});
+}
+var IMG={},IMGP={};
+function loadImg(path){
+  if(IMG[path])return Promise.resolve(IMG[path]);
+  if(!IMGP[path])IMGP[path]=gh(path,{accept:'application/vnd.github.raw'}).then(function(r){if(!r.ok)throw ghErr(r.status);return r.blob()}).then(function(b){IMG[path]=URL.createObjectURL(b);return IMG[path]}).catch(function(e){delete IMGP[path];throw e});
+  return IMGP[path];
+}
+function hydrateImgs(){
+  document.querySelectorAll('img[data-shot]').forEach(function(img){
+    var p=img.getAttribute('data-shot');if(img.dataset.loaded===p)return;
+    loadImg(p).then(function(u){img.src=u;img.dataset.loaded=p}).catch(function(){img.alt='No se pudo cargar la captura'});
+  });
+}
+function shrinkToJpeg(file){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){
+      var MAX=1600,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,MAX/Math.max(w,h));
+      var c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
+      res(c.toDataURL('image/jpeg',0.85).split(',')[1]);
+    };
+    im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('imagen'))};
+    im.src=u;
+  });
+}
+
+/* ---------- visor de capturas ---------- */
+function openViewer(path){
+  var v=$('viewer');v.hidden=false;$('viewer-img').removeAttribute('src');
+  loadImg(path).then(function(u){$('viewer-img').src=u}).catch(function(){$('viewer-img').alt='No se pudo cargar la captura'});
+}
+
+/* ---------- hoja de registro ---------- */
+var sh={n:0,slot:'a',status:'hecha',feel:[],race:null,existing:null,delArmed:false,shots:[]};
+function renderShots(){
+  $('f-shots').innerHTML=sh.shots.map(function(x,i){
+    var img=x.path?'<img data-shot="'+esc(x.path)+'" alt="Captura '+(i+1)+'">':'<img src="'+esc(x.preview)+'" alt="Captura '+(i+1)+'">';
+    return '<div class="shot">'+img+'<button type="button" data-act="rmshot" data-i="'+i+'" aria-label="Quitar captura '+(i+1)+'">×</button></div>';
+  }).join('');
+  $('f-file').hidden=sh.shots.length>=4;
+  hydrateImgs();
+}
+function $(id){return document.getElementById(id)}
+function paceReadout(){
+  var km=parseFloat($('f-km').value),t=parseDur($('f-time').value);
+  var raw=$('f-time').value.trim();
+  if(raw&&t===null){$('f-pace').textContent='Tiempo no válido';return}
+  $('f-pace').textContent=t?(fdur(t)+(km>0?' · '+fpace(t/km)+' /km de media':'')):'';
+}
+function setStatus(v){
+  sh.status=v;
+  document.querySelectorAll('#s-status button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===v))});
+  $('s-metrics').style.display=v==='saltada'?'none':'flex';
+}
+function renderFeel(){
+  $('f-feel').innerHTML=FEELS.map(function(f){return '<button type="button" data-act="feel" data-v="'+esc(f)+'" aria-pressed="'+(sh.feel.indexOf(f)>=0)+'">'+esc(f)+'</button>'}).join('');
+}
+function openSheet(n,slot){
+  var w=W[n-1],ex=sess(n,slot),race=(slot==='a'&&w.race)?RACES[w.race]:null,p=slot==='a'?plannedA(n):plannedB(n);
+  sh.n=n;sh.slot=slot;sh.race=race;sh.existing=ex;sh.delArmed=false;sh.feel=ex&&ex.feel?ex.feel.slice():[];
+  sh.shots=(ex&&ex.shots?ex.shots:[]).map(function(path){return {path:path}});
+  renderShots();
+  $('s-kicker').textContent='Semana '+n+' · '+(slot==='a'?'Día A':'Día B');
+  $('s-title').textContent=race?race.name:p.t;
+  $('f-time-l').textContent=race?'Tiempo oficial':'Tiempo';
+  var defDate=ex&&ex.date?ex.date:(pdate(n,slot)||(function(){var t=todayIso();return t>=wkStart(n)&&t<=wkSun(n)?t:addDays(wkStart(n),1)})());
+  $('f-date').value=defDate;
+  var km=ex&&ex.km?ex.km:(race?race.km:(p&&p.km?p.km:''));
+  $('f-km').value=km===''?'':String(Math.round(km*100)/100);
+  $('f-time').value=ex&&ex.durationSec?fdur(ex.durationSec):'';
+  $('f-hr').value=ex&&ex.avgHr?ex.avgHr:'';
+  $('f-rpe').value=ex&&ex.rpe?ex.rpe:5;$('f-rpe-o').textContent=$('f-rpe').value;
+  $('f-notes').value=ex&&ex.notes?ex.notes:'';
+  $('s-err').textContent='';
+  $('s-del').hidden=!ex;$('s-del').textContent='Borrar registro';
+  $('s-save').disabled=!state.db;$('s-save').textContent='Guardar';
+  if(!state.db)$('s-err').textContent='Sin conexión con tus datos. Revisa la conexión a internet.';
+  setStatus(ex?ex.status:'hecha');renderFeel();paceReadout();
+  $('sheet').hidden=false;
+}
+function closeSheet(){$('sheet').hidden=true}
+function numOrNull(v){var x=parseFloat(String(v).replace(',','.'));return isNaN(x)?null:x}
+function saveErr(e){
+  if(e&&e.status===401)return 'La clave de acceso ya no vale. Ve a Plan y cambia la clave.';
+  if(e&&e.status===403)return 'La clave no tiene permiso para escribir en tus datos.';
+  if(e&&e.status===413)return 'Una captura pesa demasiado. Prueba con otra.';
+  if(e&&e.message==='imagen')return 'No he podido leer una de las imágenes. Prueba con otra captura.';
+  return 'No se pudo guardar. Comprueba que tienes internet y vuelve a intentarlo.';
+}
+async function saveSheet(ev){
+  ev.preventDefault();
+  if(!state.db)return;
+  var key=sid(sh.n,sh.slot);
+  var rec={week:sh.n,slot:sh.slot,status:sh.status,race:sh.race?sh.race.key:null,date:$('f-date').value||null,feel:sh.feel.slice(),notes:$('f-notes').value.trim(),updatedAt:new Date().toISOString()};
+  if(sh.status!=='saltada'){
+    var t=parseDur($('f-time').value);
+    if($('f-time').value.trim()&&t===null){$('s-err').textContent='El tiempo no se entiende. Escríbelo como 54.12 o 1.21.30.';return}
+    rec.km=numOrNull($('f-km').value);rec.durationSec=t;rec.avgHr=numOrNull($('f-hr').value);rec.rpe=parseInt($('f-rpe').value,10);
+    if(rec.km&&t)rec.paceSec=Math.round(t/rec.km);
+  }
+  $('s-save').disabled=true;$('s-err').textContent='';
+  var paths=[],fresh=[];
+  try{
+    for(var i=0;i<sh.shots.length;i++){
+      var x=sh.shots[i];
+      if(x.path){paths.push(x.path);continue}
+      $('s-save').textContent='Subiendo captura '+(i+1)+'…';
+      var b64=await shrinkToJpeg(x.file);
+      var p='capturas/'+key+'-'+Date.now().toString(36)+i+'.jpg';
+      await putBinary(p,b64,'Captura '+key);
+      paths.push(p);fresh.push(p);
+      if(x.preview){IMG[p]=x.preview}
+    }
+    rec.shots=paths;
+    $('s-save').textContent='Guardando…';
+    var d=await mutate('registros.json',{sesiones:{}},function(d){d.sesiones=d.sesiones||{};d.sesiones[key]=rec;return d},'Registro '+key);
+    state.sessions=d.sesiones||{};
+    var gone=((sh.existing&&sh.existing.shots)||[]).filter(function(q){return paths.indexOf(q)<0});
+    for(var k=0;k<gone.length;k++){try{await deleteFile(gone[k],'Quitar captura de '+key)}catch(_){}}
+    closeSheet();render();
+  }catch(e){
+    for(var m=0;m<fresh.length;m++){try{await deleteFile(fresh[m],'Deshacer captura de '+key)}catch(_){}}
+    $('s-err').textContent=saveErr(e);
+  }
+  $('s-save').disabled=!state.db;$('s-save').textContent='Guardar';
+}
+async function delSheet(){
+  if(!state.db||!sh.existing)return;
+  if(!sh.delArmed){sh.delArmed=true;$('s-del').textContent='Pulsa otra vez para borrar';return}
+  var key=sid(sh.n,sh.slot);
+  try{
+    var d=await mutate('registros.json',{sesiones:{}},function(d){if(d.sesiones)delete d.sesiones[key];return d},'Borrar '+key);
+    state.sessions=d.sesiones||{};
+    var old=sh.existing.shots||[];
+    for(var i=0;i<old.length;i++){try{await deleteFile(old[i],'Borrar captura de '+key)}catch(_){}}
+    closeSheet();render();
+  }catch(e){$('s-err').textContent=saveErr(e)}
+}
+
+/* ---------- días de entreno ---------- */
+var dayQueue=Promise.resolve();
+function setDay(n,slot,d){
+  if(!state.db)return;
+  var key='w'+pad(n),cur=Object.assign({},state.schedule[key]||{});
+  if(cur[slot]===d||(slot==='a'&&!cur[slot]&&d===wkSun(n)))return;
+  var before=state.schedule[key];
+  cur.week=n;cur[slot]=d;state.schedule[key]=cur;render();
+  dayQueue=dayQueue.then(function(){
+    return mutate('calendario.json',{},function(c){var w=Object.assign({},c[key]||{});w.week=n;w[slot]=d;c[key]=w;return c},'Día '+slot.toUpperCase()+' semana '+n).then(function(c){state.schedule=c;render()});
+  }).catch(function(e){if(before)state.schedule[key]=before;else delete state.schedule[key];state.loadErr=saveErr(e);render()});
+}
+
+/* ---------- carga de datos ---------- */
+var loading=false;
+async function loadAll(){
+  if(!TOKEN||loading)return;
+  loading=true;
+  try{
+    var r=await Promise.all([readJson('registros.json',{sesiones:{}}),readJson('calendario.json',{}),readJson('ajustes.json',{settings:{},overrides:{}}),readJson('notas.json',{notas:[]})]);
+    state.sessions=r[0].sesiones||{};state.schedule=r[1]||{};
+    state.settings=(r[2]&&r[2].settings)||{};state.overrides=(r[2]&&r[2].overrides)||{};
+    state.coach=(r[3]&&r[3].notas)||[];
+    state.db=true;state.loadErr='';
+  }catch(e){
+    if(e&&e.status===401){state.loadErr='';forgetToken('La clave de acceso ya no vale. Pega una nueva.');}
+    else if(e&&e.status===404){state.loadErr='';forgetToken('La clave no da acceso a plan-sub2-datos. Revisa que elegiste ese repositorio al crearla.');}
+    else{state.db=state.db||false;state.loadErr='No se han podido cargar tus datos. Comprueba que tienes internet.'}
+  }
+  loading=false;render();
+}
+function forgetToken(msg){
+  TOKEN=null;try{localStorage.removeItem('gh_token')}catch(e){}
+  state.db=false;$('c-err').textContent=msg||'';route();
+}
+async function saveToken(){
+  var v=$('f-token').value.trim();
+  if(!v){$('c-err').textContent='Pega primero la clave.';return}
+  $('c-go').disabled=true;$('c-err').textContent='';
+  TOKEN=v;
+  try{
+    var r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO,{headers:{'Authorization':'Bearer '+v,'Accept':'application/vnd.github+json'},cache:'no-store'});
+    if(r.status===401)throw ghErr(401);
+    if(r.status===404)throw ghErr(404);
+    if(!r.ok)throw ghErr(r.status);
+    var j=await r.json();
+    if(j.permissions&&j.permissions.push===false)throw ghErr(403);
+    try{localStorage.setItem('gh_token',v)}catch(e){}
+    $('f-token').value='';route();await loadAll();
+  }catch(e){
+    TOKEN=null;
+    $('c-err').textContent=e.status===401?'Esa clave no es válida. Cópiala otra vez entera.':(e.status===404?'Esa clave no da acceso a plan-sub2-datos.':(e.status===403?'La clave no tiene permiso de escritura. Ponle Contents: Read and write.':'No se pudo comprobar la clave. Revisa la conexión.'));
+  }
+  $('c-go').disabled=false;
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.dataset.act;
+  if(a==='log'){openSheet(parseInt(t.dataset.n,10),t.dataset.slot)}
+  else if(a==='close'){closeSheet()}
+  else if(a==='status'){setStatus(t.dataset.v)}
+  else if(a==='feel'){var v=t.dataset.v,i=sh.feel.indexOf(v);if(i>=0)sh.feel.splice(i,1);else sh.feel.push(v);renderFeel()}
+  else if(a==='del'){delSheet()}
+  else if(a==='prev'){if(state.sel>1){state.sel--;render()}}
+  else if(a==='next'){if(state.sel<22){state.sel++;render()}}
+  else if(a==='today'){state.sel=cw<1?1:(cw>22?22:cw);render()}
+  else if(a==='goweek'){state.sel=parseInt(t.dataset.n,10);location.hash='#semana';render()}
+  else if(a==='lvl'){state.lvlView=parseInt(t.dataset.l,10);render()}
+  else if(a==='rmshot'){sh.shots.splice(parseInt(t.dataset.i,10),1);renderShots()}
+  else if(a==='setday'){setDay(parseInt(t.dataset.n,10),t.dataset.slot,t.dataset.d)}
+  else if(a==='viewshot'){e.preventDefault();openViewer(t.dataset.p)}
+  else if(a==='closeviewer'){$('viewer').hidden=true}
+  else if(a==='savetoken'){saveToken()}
+  else if(a==='logout'){forgetToken('')}
+  else if(a==='reload'){loadAll()}
+});
+$('form').addEventListener('submit',saveSheet);
+$('f-file').addEventListener('change',function(){
+  var files=Array.prototype.slice.call(this.files||[]);
+  files.forEach(function(f){if(sh.shots.length<4&&/^image\//.test(f.type))sh.shots.push({file:f,preview:URL.createObjectURL(f)})});
+  this.value='';renderShots();
+});
+$('f-km').addEventListener('input',paceReadout);
+$('f-time').addEventListener('input',paceReadout);
+$('f-rpe').addEventListener('input',function(){$('f-rpe-o').textContent=$('f-rpe').value});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(!$('viewer').hidden)$('viewer').hidden=true;else if(!$('sheet').hidden)closeSheet()}});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&$('sheet').hidden){cw=currentWeek();loadAll()}});
+
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+
+route();render();loadAll();
+})();
+</script>
+</body>
+</html>
