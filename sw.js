@@ -1,5 +1,5 @@
 // Primero la red (para que los cambios lleguen al momento) y, sin conexión, la última copia guardada.
-const CACHE = 'plan-sub2-v2';
+const CACHE = 'plan-sub2-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

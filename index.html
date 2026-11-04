@@ -219,6 +219,9 @@ tr.hit td{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weigh
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .actions .primary{flex:1}
 .empty{color:var(--ink2);font-size:14px}
+.extra{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.extrahead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.extrahead b{font-family:var(--display);font-size:22px;font-weight:600;line-height:1.1;min-width:0;overflow-wrap:anywhere}
 .connect{display:flex;flex-direction:column;gap:12px}
 .connect h2{font-size:30px;line-height:1.05}
 .connect ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
@@ -278,7 +281,8 @@ tr.hit td{background:color-mix(in srgb,var(--accent) 12%,transparent);font-weigh
       <div class="lbl" id="s-kicker"></div>
       <h2 id="s-title"></h2>
     </div>
-    <div class="field">
+    <div class="field" id="f-title-field" hidden><label for="f-title">Qué has hecho</label><input type="text" id="f-title" placeholder="Rodaje con amigos, carrera popular…" maxlength="80"></div>
+    <div class="field" id="f-status-field">
       <span class="lbl">Cómo fue</span>
       <div class="seg" id="s-status">
         <button type="button" data-act="status" data-v="hecha" aria-pressed="true">Hecha</button>
@@ -433,6 +437,12 @@ state.sel=cw<1?1:(cw>22?22:cw);
 
 function effLevel(n){return state.settings.level||phaseOf(n).level}
 function sess(n,slot){return state.sessions[sid(n,slot)]||null}
+function extrasOf(n){
+  return Object.keys(state.sessions).filter(function(k){var s=state.sessions[k];return s&&s.slot==='x'&&Number(s.week)===n})
+    .map(function(k){return {k:k,s:state.sessions[k]}}).sort(function(a,b){return String(a.s.date||'').localeCompare(String(b.s.date||''))});
+}
+function weekOfDate(d){if(!d)return null;var x=dayDiff(START,d);if(x<0)return null;var n=Math.floor(x/7)+1;return n>22?null:n}
+function weekKm(n){var t=0;Object.keys(state.sessions).forEach(function(k){var s=state.sessions[k];if(s&&Number(s.week)===n&&s.status!=='saltada')t+=Number(s.km)||0});return t}
 function ovr(n){return state.overrides['w'+pad(n)]||null}
 function plannedB(n){var w=W[n-1],o=ovr(n);var b=Object.assign({},w.b);if(o&&o.b)Object.assign(b,o.b);return b}
 function plannedA(n){var w=W[n-1];if(w.race)return null;var o=ovr(n);var a=Object.assign({},w.a);if(o&&o.a)Object.assign(a,o.a);return a}
@@ -505,6 +515,17 @@ function coachCard(){
   else list.forEach(function(m){h+='<div class="msg"><small>'+(m.createdAt?esc(String(m.createdAt).slice(0,10)):'')+(m.week?' · semana '+esc(m.week):'')+'</small>'+esc(m.text)+'</div>'});
   return h+'</div>';
 }
+function extrasCard(n){
+  var list=extrasOf(n);
+  var h='<article class="card sess"><header><span class="slot">Entrenos extra</span>'+(list.length?'<span class="st hecha">'+list.length+'</span>':'')+'</header>';
+  if(!list.length)h+='<p class="empty">Rodajes con amigos, carreras populares o cualquier entreno que hagas fuera del plan.</p>';
+  list.forEach(function(e){
+    var s=e.s;
+    h+='<div class="extra"><div class="extrahead"><b>'+esc(s.title||'Entreno extra')+'</b><span class="small muted">'+(s.date?fdow(s.date)+' '+fshort(s.date):'')+'</span></div>'+logSummary(s)+'<button class="btn ghost" data-act="logx" data-k="'+esc(e.k)+'">Editar</button></div>';
+  });
+  h+='<button class="btn '+(list.length?'ghost':'primary')+'" data-act="logx" data-n="'+n+'">Añadir entreno extra</button></article>';
+  return h;
+}
 function renderSemana(){
   var n=state.sel,w=W[n-1],ph=phaseOf(n),lvl=effLevel(n);
   var h='<div class="weekhead"><button class="btn icon" data-act="prev" aria-label="Semana anterior"'+(n<=1?' disabled':'')+'>‹</button>';
@@ -519,21 +540,22 @@ function renderSemana(){
   h+=coachCard();
   h+=sessionCard(n,'b');
   h+=w.race?raceCardWeek(n):sessionCard(n,'a');
+  h+=extrasCard(n);
   return h;
 }
 function renderPlan(){
   var done=0,km=0;
-  Object.keys(state.sessions).forEach(function(k){var s=state.sessions[k];if(s.status==='hecha'||s.status==='parcial'){done++;km+=Number(s.km)||0}});
-  var h='<div class="stats"><div><small>Sesiones</small><b>'+done+' <i>/ 44</i></b></div><div><small>Km</small><b>'+(Math.round(km*10)/10)+'</b></div><div><small>Semana</small><b>'+(cw<1?'–':(cw>22?'22':cw))+' <i>/ 22</i></b></div></div>';
+  var extras=0;Object.keys(state.sessions).forEach(function(k){var s=state.sessions[k];if(s.status==='hecha'||s.status==='parcial'){if(s.slot==='x')extras++;else done++;km+=Number(s.km)||0}});
+  var h='<div class="stats"><div><small>Sesiones</small><b>'+done+' <i>/ 44</i></b>'+(extras?'<span class="small muted">+'+extras+' extra'+(extras>1?'s':'')+'</span>':'')+'</div><div><small>Km</small><b>'+(Math.round(km*10)/10)+'</b></div><div><small>Semana</small><b>'+(cw<1?'–':(cw>22?'22':cw))+' <i>/ 22</i></b></div></div>';
   var MAXK=24,cols='',xl='';
   W.forEach(function(w){
     var n=w.n,a=plannedA(n),planned=a?a.km:(RACES[w.race].km);
-    var tot=0;['a','b'].forEach(function(sl){var s=sess(n,sl);if(s&&s.status!=='saltada')tot+=Number(s.km)||0});
+    var tot=weekKm(n);
     cols+='<div class="col'+(w.race?' race':'')+(n===cw?' cur':'')+'"><div class="ghost" style="height:'+Math.min(100,planned/MAXK*100)+'%"></div><div class="solid" style="height:'+Math.min(100,tot/MAXK*100)+'%"></div></div>';
     xl+='<span>'+n+'</span>';
   });
   h+='<div class="card"><h4 class="sec-title" style="margin:0 0 4px">Km por semana</h4><div class="chart"><div class="grid" style="bottom:'+(10/MAXK*100)+'%"><span>10</span></div><div class="grid" style="bottom:'+(20/MAXK*100)+'%"><span>20</span></div><div class="bars">'+cols+'</div></div><div class="xl">'+xl+'</div>';
-  h+='<div class="legend"><span><i style="border:1px solid var(--ink2);opacity:.6"></i>Día A del plan</span><span><i style="background:var(--accent)"></i>Km registrados</span><span><i style="background:var(--ok)"></i>Semana de carrera</span></div></div>';
+  h+='<div class="legend"><span><i style="border:1px solid var(--ink2);opacity:.6"></i>Día A del plan</span><span><i style="background:var(--accent)"></i>Km registrados (con extras)</span><span><i style="background:var(--ok)"></i>Semana de carrera</span></div></div>';
   h+='<details class="card"><summary>Reglas con el CrossFit</summary><div class="week7"><div>L<br>Cross</div><div class="q">M<br>Día B</div><div>X<br>Cross</div><div>J<br>Descanso</div><div>V<br>Cross</div><div>S<br>Descanso</div><div class="l">D<br>Día A</div></div>';
   h+='<ul class="rules"><li>Entre el Día B y el Día A, deja al menos un día en medio.</li><li>Evita el Día B justo después de un WOD con mucha pierna (sentadilla, peso muerto, saltos). Si cae así, hazlo en el lado lento del rango.</li><li>El día antes del Día A, descanso o CrossFit suave.</li><li>Semana de carrera: nada de pierna pesada los 3 días anteriores, y descanso el día después.</li><li>Si una semana solo puedes correr un día, haz el Día A.</li><li>Un tercer rodaje (30–40\' en Z2) solo si te apetece. El plan no cuenta con él, pero para el sub-2 es lo que más suma.</li><li>Si pierdes una semana, no la recuperes: repite la anterior y sigue.</li></ul>';
   h+='<p class="small muted" style="margin-top:10px"><b>Progresivos.</b> 20 segundos acelerando poco a poco hasta ir rápida pero suelta, sin esprintar (hacia 5:00 al principio y hacia 4:40 en marzo). Después, 60–90" andando o trotando, y el siguiente. En llano, al final del rodaje o del calentamiento.</p></details>';
@@ -544,7 +566,7 @@ function renderPlan(){
       var w=W[n-1],b=plannedB(n),a=plannedA(n),sb=sess(n,'b'),sa=sess(n,'a');
       var at=a?a.t:(RACES[w.race].name+' · dom '+fshort(RACES[w.race].date));
       var pb=pdate(n,'b'),pa=pdate(n,'a');
-      h+='<button class="wrow'+(n===cw?' cur':'')+'" data-act="goweek" data-n="'+n+'"><span class="wn">'+n+'</span><span class="wt"><b>'+fshort(wkStart(n))+' – '+fshort(wkSun(n))+(w.soft?' · suave':'')+(w.race?' · carrera':'')+'</b><span>B'+(pb?' '+fdow(pb):'')+' · '+esc(b.t)+'</span><span>A'+(pa?' '+fdow(pa):'')+' · '+esc(at)+'</span></span><span class="dots"><i class="dot '+(sb?esc(sb.status):'')+'"></i><i class="dot '+(sa?esc(sa.status):'')+'"></i></span></button>';
+      h+='<button class="wrow'+(n===cw?' cur':'')+'" data-act="goweek" data-n="'+n+'"><span class="wn">'+n+'</span><span class="wt"><b>'+fshort(wkStart(n))+' – '+fshort(wkSun(n))+(w.soft?' · suave':'')+(w.race?' · carrera':'')+(function(){var c=extrasOf(n).length;return c?' · +'+c+' extra'+(c>1?'s':''):''})()+'</b><span>B'+(pb?' '+fdow(pb):'')+' · '+esc(b.t)+'</span><span>A'+(pa?' '+fdow(pa):'')+' · '+esc(at)+'</span></span><span class="dots"><i class="dot '+(sb?esc(sb.status):'')+'"></i><i class="dot '+(sa?esc(sa.status):'')+'"></i></span></button>';
     }
   });
   return h;
@@ -736,17 +758,19 @@ function setStatus(v){
 function renderFeel(){
   $('f-feel').innerHTML=FEELS.map(function(f){return '<button type="button" data-act="feel" data-v="'+esc(f)+'" aria-pressed="'+(sh.feel.indexOf(f)>=0)+'">'+esc(f)+'</button>'}).join('');
 }
-function openSheet(n,slot){
-  var w=W[n-1],ex=sess(n,slot),race=(slot==='a'&&w.race)?RACES[w.race]:null,p=slot==='a'?plannedA(n):plannedB(n);
-  sh.n=n;sh.slot=slot;sh.race=race;sh.existing=ex;sh.delArmed=false;sh.feel=ex&&ex.feel?ex.feel.slice():[];
+function openSheet(n,slot,key){
+  var isX=slot==='x';
+  var w=W[n-1],ex=isX?(key?state.sessions[key]||null:null):sess(n,slot),race=(slot==='a'&&w.race)?RACES[w.race]:null,p=isX?null:(slot==='a'?plannedA(n):plannedB(n));
+  sh.n=n;sh.slot=slot;sh.key=isX?(key||null):sid(n,slot);sh.race=race;sh.existing=ex;sh.delArmed=false;sh.feel=ex&&ex.feel?ex.feel.slice():[];
+  $('f-title-field').hidden=!isX;$('f-status-field').hidden=isX;$('f-title').value=isX&&ex&&ex.title?ex.title:'';
   sh.shots=(ex&&ex.shots?ex.shots:[]).map(function(path){return {path:path}});
   renderShots();
-  $('s-kicker').textContent='Semana '+n+' · '+(slot==='a'?'Día A':'Día B');
-  $('s-title').textContent=race?race.name:p.t;
+  $('s-kicker').textContent='Semana '+n+' · '+(isX?'Entreno extra':(slot==='a'?'Día A':'Día B'));
+  $('s-title').textContent=isX?(ex&&ex.title?ex.title:'Entreno extra'):(race?race.name:p.t);
   $('f-time-l').textContent=race?'Tiempo oficial':'Tiempo';
-  var defDate=ex&&ex.date?ex.date:(pdate(n,slot)||(function(){var t=todayIso();return t>=wkStart(n)&&t<=wkSun(n)?t:addDays(wkStart(n),1)})());
+  var defDate=ex&&ex.date?ex.date:((isX?null:pdate(n,slot))||(function(){var t=todayIso();return t>=wkStart(n)&&t<=wkSun(n)?t:addDays(wkStart(n),1)})());
   $('f-date').value=defDate;
-  var km=ex&&ex.km?ex.km:(race?race.km:(p&&p.km?p.km:''));
+  var km=ex&&ex.km?ex.km:(race?race.km:(!isX&&p&&p.km?p.km:''));
   $('f-km').value=km===''?'':String(Math.round(km*100)/100);
   $('f-time').value=ex&&ex.durationSec?fdur(ex.durationSec):'';
   $('f-hr').value=ex&&ex.avgHr?ex.avgHr:'';
@@ -771,8 +795,11 @@ function saveErr(e){
 async function saveSheet(ev){
   ev.preventDefault();
   if(!state.db)return;
-  var key=sid(sh.n,sh.slot);
-  var rec={week:sh.n,slot:sh.slot,status:sh.status,race:sh.race?sh.race.key:null,date:$('f-date').value||null,feel:sh.feel.slice(),notes:$('f-notes').value.trim(),updatedAt:new Date().toISOString()};
+  var isX=sh.slot==='x',dateV=$('f-date').value||null,wk=sh.n;
+  if(isX){var wd=weekOfDate(dateV);if(wd)wk=wd}
+  var key=sh.key||('s'+pad(wk)+'x-'+Date.now().toString(36));
+  var rec={week:wk,slot:sh.slot,status:isX?'hecha':sh.status,race:sh.race?sh.race.key:null,date:dateV,feel:sh.feel.slice(),notes:$('f-notes').value.trim(),updatedAt:new Date().toISOString()};
+  if(isX)rec.title=$('f-title').value.trim()||'Entreno extra';
   if(sh.status!=='saltada'){
     var t=parseDur($('f-time').value);
     if($('f-time').value.trim()&&t===null){$('s-err').textContent='El tiempo no se entiende. Escríbelo como 54.12 o 1.21.30.';return}
@@ -795,7 +822,7 @@ async function saveSheet(ev){
     rec.shots=paths;
     $('s-save').textContent='Guardando…';
     var d=await mutate('registros.json',{sesiones:{}},function(d){d.sesiones=d.sesiones||{};d.sesiones[key]=rec;return d},'Registro '+key);
-    state.sessions=d.sesiones||{};
+    state.sessions=d.sesiones||{};sh.key=key;
     var gone=((sh.existing&&sh.existing.shots)||[]).filter(function(q){return paths.indexOf(q)<0});
     for(var k=0;k<gone.length;k++){try{await deleteFile(gone[k],'Quitar captura de '+key)}catch(_){}}
     closeSheet();render();
@@ -808,7 +835,7 @@ async function saveSheet(ev){
 async function delSheet(){
   if(!state.db||!sh.existing)return;
   if(!sh.delArmed){sh.delArmed=true;$('s-del').textContent='Pulsa otra vez para borrar';return}
-  var key=sid(sh.n,sh.slot);
+  var key=sh.key;if(!key)return;
   try{
     var d=await mutate('registros.json',{sesiones:{}},function(d){if(d.sesiones)delete d.sesiones[key];return d},'Borrar '+key);
     state.sessions=d.sesiones||{};
@@ -879,6 +906,7 @@ document.addEventListener('click',function(e){
   var t=e.target.closest('[data-act]');if(!t)return;
   var a=t.dataset.act;
   if(a==='log'){openSheet(parseInt(t.dataset.n,10),t.dataset.slot)}
+  else if(a==='logx'){if(t.dataset.k){var ex=state.sessions[t.dataset.k];openSheet(ex&&ex.week?Number(ex.week):state.sel,'x',t.dataset.k)}else openSheet(parseInt(t.dataset.n,10),'x',null)}
   else if(a==='close'){closeSheet()}
   else if(a==='status'){setStatus(t.dataset.v)}
   else if(a==='feel'){var v=t.dataset.v,i=sh.feel.indexOf(v);if(i>=0)sh.feel.splice(i,1);else sh.feel.push(v);renderFeel()}
