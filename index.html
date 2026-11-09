@@ -508,11 +508,11 @@ function raceCardWeek(n){
   h+='<button class="btn '+(s?'ghost':'primary')+'" data-act="log" data-n="'+n+'" data-slot="a">'+(s?'Editar resultado':'Registrar resultado')+'</button></article>';
   return h;
 }
-function coachCard(){
-  var list=state.coach.slice().sort(function(a,b){return String(b.createdAt||'').localeCompare(String(a.createdAt||''))}).slice(0,3);
-  var h='<div class="card coach"><h4 class="sec-title" style="margin:0">Notas de Claude</h4>';
-  if(!list.length)h+='<p class="empty">Cuando me cuentes cómo te ha ido, pídeme en el chat que revise tus registros. Los ajustes del plan y mis comentarios aparecerán aquí.</p>';
-  else list.forEach(function(m){h+='<div class="msg"><small>'+(m.createdAt?esc(String(m.createdAt).slice(0,10)):'')+(m.week?' · semana '+esc(m.week):'')+'</small>'+esc(m.text)+'</div>'});
+function coachCard(n){
+  var list=state.coach.filter(function(m){return Number(m.week)===n}).sort(function(a,b){return String(a.createdAt||'').localeCompare(String(b.createdAt||''))});
+  var h='<div class="card coach"><h4 class="sec-title" style="margin:0">Notas de Claude · semana '+n+'</h4>';
+  if(!list.length)h+='<p class="empty">'+(n>cw?'Aún no ha llegado esta semana.':'Esta semana todavía no tiene notas. Aparecerán aquí cuando revise tus registros.')+'</p>';
+  else list.forEach(function(m){h+='<div class="msg"><small>'+(m.createdAt?esc(fdow(String(m.createdAt).slice(0,10))+' '+fshort(String(m.createdAt).slice(0,10))):'')+'</small>'+esc(m.text)+'</div>'});
   return h+'</div>';
 }
 function extrasCard(n){
@@ -537,7 +537,7 @@ function renderSemana(){
   if(n!==cw&&cw>=1&&cw<=22)h+='<button class="chip" data-act="today" style="cursor:pointer;border-color:var(--line)">Ir a esta semana</button>';
   h+='</div>';
   if(cw<1)h+='<div class="card small">El plan empieza el lunes 2 de noviembre. Quedan '+dayDiff(todayIso(),START)+' días.</div>';
-  h+=coachCard();
+  h+=coachCard(n);
   h+=sessionCard(n,'b');
   h+=w.race?raceCardWeek(n):sessionCard(n,'a');
   h+=extrasCard(n);
